@@ -14,13 +14,17 @@ class WorkSession(db.Model):
     duration = db.Column(db.Integer, nullable=True)  # Duration in seconds
 
     def to_dict(self):
+        # Adjust time by 5 hours and 30 minutes
+        adjusted_start_time = self.start_time + timedelta(hours=5, minutes=30)
+        adjusted_end_time = self.end_time + timedelta(hours=5, minutes=30) if self.end_time else None
+
         return {
             'id': self.id,
             'line': self.line,
             'leg': self.leg,
             'machine': self.machine,
-            'start_time': self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
-            'end_time': self.end_time.strftime('%Y-%m-%d %H:%M:%S') if self.end_time else None,
+            'start_time': adjusted_start_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'end_time': adjusted_end_time.strftime('%Y-%m-%d %H:%M:%S') if adjusted_end_time else None,
             'duration': self.duration
         }
 

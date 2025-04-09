@@ -1,0 +1,143 @@
+:root {
+    --mondelez-purple: #663399;
+    --mondelez-light-purple: #8652c9;
+    --mondelez-dark-purple: #4b2570;
+    --mondelez-white: #ffffff;
+    --mondelez-gray: #f8f9fa;
+}
+
+body {
+    background-color: var(--mondelez-gray);
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.navbar {
+    background-color: var(--mondelez-purple);
+    padding: 1rem 0;
+}
+
+.company-info {
+    text-align: right;
+    line-height: 1.4;
+}
+
+.company-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.plant-name {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.app-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-top: 0.2rem;
+}
+
+.navbar-brand img {
+    height: 40px;
+}
+
+.card {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 8px;
+}
+
+.card-header {
+    background-color: var(--mondelez-purple);
+    color: var(--mondelez-white);
+    border-radius: 8px 8px 0 0 !important;
+    padding: 1rem;
+}
+
+#timer {
+    font-family: 'Courier New', monospace;
+    color: var(--mondelez-purple);
+    font-weight: bold;
+    font-size: 4rem;
+    letter-spacing: 2px;
+    margin: 1rem 0;
+}
+
+.btn-primary {
+    background-color: var(--mondelez-purple);
+    border-color: var(--mondelez-purple);
+}
+
+.btn-primary:hover {
+    background-color: var(--mondelez-light-purple);
+    border-color: var(--mondelez-light-purple);
+}
+
+.btn-primary:focus {
+    background-color: var(--mondelez-dark-purple);
+    border-color: var(--mondelez-dark-purple);
+    box-shadow: 0 0 0 0.25rem rgba(102, 51, 153, 0.25);
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.table th {
+    background-color: var(--mondelez-gray);
+    color: var(--mondelez-purple);
+}
+
+.form-select:disabled {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+}
+
+.form-select:focus {
+    border-color: var(--mondelez-purple);
+    box-shadow: 0 0 0 0.25rem rgba(102, 51, 153, 0.25);
+}
+
+.form-control:focus {
+    border-color: var(--mondelez-purple);
+    box-shadow: 0 0 0 0.25rem rgba(102, 51, 153, 0.25);
+}
+
+#timerSection {
+    background-color: var(--mondelez-white);
+    padding: 2rem;
+    border-radius: 0.5rem;
+    margin-top: 2rem;
+    border: 1px solid #dee2e6;
+}
+
+.display-4 {
+    font-size: 3.5rem;
+    font-weight: 300;
+    line-height: 1.2;
+}
+
+.export-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: var(--mondelez-white);
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.export-section h3 {
+    color: var(--mondelez-purple);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.form-label {
+    color: var(--mondelez-dark-purple);
+    font-weight: 500;
+}
+
+.navbar-text {
+    font-size: 1.5rem;
+    font-weight: 500;
+} 

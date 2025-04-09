@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CIL Tracker - Mondelez India</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <div class="company-info text-end ms-auto">
+                <div class="text-white">
+                    <div class="company-name">Mondelez India Pvt. Ltd.</div>
+                    <div class="plant-name">Sricity Plant</div>
+                    <div class="app-name">CIL Tracker</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Work Session Tracking</h4>
+            </div>
+            <div class="card-body">
+                <form id="trackingForm">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="line" class="form-label">Select Line</label>
+                            <select class="form-select" id="line" required>
+                                <option value="">Choose a line...</option>
+                                {% for line in line_config %}
+                                <option value="{{ line }}">{{ line }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label for="leg" class="form-label">Select Leg</label>
+                            <select class="form-select" id="leg" required disabled>
+                                <option value="">Choose a leg...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label for="machine" class="form-label">Select Machine</label>
+                            <select class="form-select" id="machine" required disabled>
+                                <option value="">Choose a machine...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary" id="startBtn">Start Session</button>
+                    </div>
+                </form>
+
+                <div id="timerSection" class="text-center mt-4 d-none">
+                    <h2 id="timer" class="display-4">00:00:00</h2>
+                    <button class="btn btn-danger" id="stopBtn">Stop Session</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="export-section">
+            <h3>Export Data</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="startDate">
+                    </div>
+                    <div class="mb-3">
+                        <label for="endDate" class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="endDate">
+                    </div>
+                    <div class="mb-3">
+                        <label for="exportFormat" class="form-label">Export Format</label>
+                        <select class="form-select" id="exportFormat">
+                            <option value="excel">Excel (.xlsx)</option>
+                            <option value="csv">CSV (.csv)</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" id="exportBtn">Export Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const lineConfig = {{ line_config|tojson|safe }};
+    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html> 

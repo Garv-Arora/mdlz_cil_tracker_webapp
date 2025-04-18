@@ -4,16 +4,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const machineSelect = document.getElementById('machine');
     const startBtn = document.getElementById('startBtn');
     const stopBtn = document.getElementById('stopBtn');
-    const timerSection = document.getElementById('timerSection');
     const timerDisplay = document.getElementById('timer');
+    const timerSection = document.getElementById('timerSection');
+    const abhSection = document.getElementById('abhSection');
+    const submitAbhBtn = document.getElementById('submitAbhBtn');
     const exportBtn = document.getElementById('exportBtn');
     const startDateInput = document.getElementById('startDate');
     const endDateInput = document.getElementById('endDate');
     const exportFormatSelect = document.getElementById('exportFormat');
 
-    let currentSessionId = null;
-    let timerInterval = null;
-    let startTime = null;
+    let startTime;
+    let timerInterval;
+    let currentSessionId;
 
     // Set default dates for export
     const today = new Date();
@@ -21,35 +23,35 @@ document.addEventListener('DOMContentLoaded', function() {
     startDateInput.value = lastMonth.toISOString().split('T')[0];
     endDateInput.value = today.toISOString().split('T')[0];
 
-    // Update leg options when line is selected
+    // Update leg options when line changes
     lineSelect.addEventListener('change', function() {
         const selectedLine = this.value;
         legSelect.innerHTML = '<option value="">Choose a leg...</option>';
         machineSelect.innerHTML = '<option value="">Choose a machine...</option>';
         
         if (selectedLine) {
-            const legs = lineConfig[selectedLine].legs;
-            legs.forEach(leg => {
+            const legs = lineConfig[selectedLine];
+            Object.keys(legs).forEach(leg => {
                 const option = document.createElement('option');
                 option.value = leg;
                 option.textContent = leg;
                 legSelect.appendChild(option);
             });
             legSelect.disabled = false;
-            machineSelect.disabled = true;
         } else {
             legSelect.disabled = true;
             machineSelect.disabled = true;
         }
     });
 
-    // Update machine options when leg is selected
+    // Update machine options when leg changes
     legSelect.addEventListener('change', function() {
         const selectedLine = lineSelect.value;
+        const selectedLeg = this.value;
         machineSelect.innerHTML = '<option value="">Choose a machine...</option>';
         
-        if (selectedLine) {
-            const machines = lineConfig[selectedLine].machines;
+        if (selectedLeg) {
+            const machines = lineConfig[selectedLine][selectedLeg];
             machines.forEach(machine => {
                 const option = document.createElement('option');
                 option.value = machine;
@@ -62,92 +64,83 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Start timer
-    startBtn.addEventListener('click', async function(e) {
+    // Start session
+    document.getElementById('trackingForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        const data = {
-            line: lineSelect.value,
-            leg: legSelect.value,
-            machine: machineSelect.value
-        };
+        const name = document.getElementById('name').value;
+        const line = lineSelect.value;
+        const leg = legSelect.value;
+        const machine = machineSelect.value;
 
         try {
-            const response = await fetch('/api/start_session', {
+            const response = await fetch('/api/sessions', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify({
+                    name: name,
+                    line: line,
+                    leg: leg,
+                    machine: machine
+                })
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to start session');
+            if (response.ok) {
+                const data = await response.json();
+                currentSessionId = data.session_id;
+                startTime = new Date();
+                startTimer();
+                
+                // Hide form and show timer
+                this.style.display = 'none';
+                timerSection.classList.remove('d-none');
+            } else {
+                alert('Failed to start session');
             }
-
-            const result = await response.json();
-            currentSessionId = result.session_id;
-            
-            // Start timer
-            startTime = Date.now();
-            timerInterval = setInterval(updateTimer, 1000);
-            
-            // Show timer section
-            timerSection.classList.remove('d-none');
-            startBtn.disabled = true;
-            lineSelect.disabled = true;
-            legSelect.disabled = true;
-            machineSelect.disabled = true;
         } catch (error) {
-            console.error('Error starting session:', error);
-            alert('Error starting session. Please try again.');
+            console.error('Error:', error);
+            alert('An error occurred while starting the session');
         }
     });
 
-    // Stop timer
-    stopBtn.addEventListener('click', async function() {
-        if (!currentSessionId) return;
-
-        try {
-            const response = await fetch('/api/stop_session', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ session_id: currentSessionId })
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to stop session');
-            }
-
-            const result = await response.json();
-            
-            // Stop timer
-            clearInterval(timerInterval);
-            
-            // Reset form
-            timerSection.classList.add('d-none');
-            startBtn.disabled = false;
-            lineSelect.disabled = false;
-            lineSelect.value = '';
-            legSelect.value = '';
-            machineSelect.value = '';
-            currentSessionId = null;
-        } catch (error) {
-            console.error('Error stopping session:', error);
-            alert('Error stopping session. Please try again.');
-        }
+    // Stop session
+    stopBtn.addEventListener('click', function() {
+        clearInterval(timerInterval);
+        timerSection.classList.add('d-none');
+        abhSection.classList.remove('d-none');
     });
 
-    // Update timer display
-    function updateTimer() {
-        const elapsed = Math.floor((Date.now() - startTime) / 1000);
-        const totalMinutes = Math.floor(elapsed / 60);
-        const seconds = elapsed % 60;
+    // Submit ABH count
+    submitAbhBtn.addEventListener('click', async function() {
+        const abhDetected = document.getElementById('abhDetected').value;
         
-        timerDisplay.textContent = `${String(totalMinutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    }
+        try {
+            const response = await fetch(`/api/sessions/${currentSessionId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    abh_detected: parseInt(abhDetected)
+                })
+            });
+
+            if (response.ok) {
+                // Reset form and show success message
+                document.getElementById('trackingForm').reset();
+                document.getElementById('trackingForm').style.display = 'block';
+                abhSection.classList.add('d-none');
+                alert('Session completed successfully!');
+            } else {
+                alert('Failed to update session');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred while updating the session');
+        }
+    });
 
     // Export data
     exportBtn.addEventListener('click', async function() {
@@ -156,54 +149,42 @@ document.addEventListener('DOMContentLoaded', function() {
         const format = exportFormatSelect.value;
 
         if (!startDate || !endDate) {
-            alert('Please select both start and end dates.');
+            alert('Please select both start and end dates');
             return;
         }
-
-        if (new Date(startDate) > new Date(endDate)) {
-            alert('Start date cannot be after end date.');
-            return;
-        }
-
-        exportBtn.disabled = true;
-        exportBtn.textContent = 'Exporting...';
 
         try {
-            const response = await fetch('/api/export', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    start_date: startDate,
-                    end_date: endDate,
-                    format: format
-                })
-            });
-
-            const contentType = response.headers.get('content-type');
+            const response = await fetch(`/api/export?start_date=${startDate}&end_date=${endDate}&format=${format}`);
             
-            if (response.ok && (contentType.includes('spreadsheetml') || contentType.includes('csv'))) {
+            if (response.ok) {
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = response.headers.get('content-disposition').split('filename=')[1] || 
-                           `cil_sessions_${startDate}_${endDate}.${format === 'excel' ? 'xlsx' : 'csv'}`;
+                a.download = `work_sessions.${format}`;
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);
-                document.body.removeChild(a);
+                a.remove();
             } else {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Export failed');
+                alert('Failed to export data');
             }
         } catch (error) {
-            console.error('Error exporting data:', error);
-            alert(error.message || 'Error exporting data. Please try again.');
-        } finally {
-            exportBtn.disabled = false;
-            exportBtn.textContent = 'Export Data';
+            console.error('Error:', error);
+            alert('An error occurred while exporting data');
         }
     });
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            const now = new Date();
+            const diff = now - startTime;
+            
+            const hours = Math.floor(diff / 3600000);
+            const minutes = Math.floor((diff % 3600000) / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
+            
+            timerDisplay.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }, 1000);
+    }
 }); 

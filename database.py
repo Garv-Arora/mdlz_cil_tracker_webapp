@@ -6,12 +6,14 @@ db = SQLAlchemy()
 
 class WorkSession(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
     line = db.Column(db.String(10), nullable=False)
     leg = db.Column(db.String(10), nullable=False)
     machine = db.Column(db.String(10), nullable=False)
     start_time = db.Column(db.DateTime, nullable=False)
     end_time = db.Column(db.DateTime, nullable=True)
     duration = db.Column(db.Integer, nullable=True)  # Duration in seconds
+    abh_detected = db.Column(db.Integer, nullable=True)  # Number of ABH detected
 
     def to_dict(self):
         # Adjust time by 5 hours and 30 minutes
@@ -20,12 +22,14 @@ class WorkSession(db.Model):
 
         return {
             'id': self.id,
+            'name': self.name,
             'line': self.line,
             'leg': self.leg,
             'machine': self.machine,
             'start_time': adjusted_start_time.strftime('%Y-%m-%d %H:%M:%S'),
             'end_time': adjusted_end_time.strftime('%Y-%m-%d %H:%M:%S') if adjusted_end_time else None,
-            'duration': self.duration
+            'duration': self.duration,
+            'abh_detected': self.abh_detected
         }
 
     @classmethod

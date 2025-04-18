@@ -28,6 +28,11 @@
             <div class="card-body">
                 <form id="trackingForm">
                     <div class="row g-3">
+                        <div class="col-md-12">
+                            <label for="name" class="form-label">Enter Your Name</label>
+                            <input type="text" class="form-control" id="name" required placeholder="Enter your name">
+                        </div>
+                        
                         <div class="col-md-4">
                             <label for="line" class="form-label">Select Line</label>
                             <select class="form-select" id="line" required>
@@ -61,6 +66,18 @@
                 <div id="timerSection" class="text-center mt-4 d-none">
                     <h2 id="timer" class="display-4">00:00:00</h2>
                     <button class="btn btn-danger" id="stopBtn">Stop Session</button>
+                </div>
+
+                <div id="abhSection" class="text-center mt-4 d-none">
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="abhDetected" class="form-label">Number of ABH Detected</label>
+                                <input type="number" class="form-control" id="abhDetected" min="0" value="0">
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-success" id="submitAbhBtn">Submit</button>
                 </div>
             </div>
         </div>
